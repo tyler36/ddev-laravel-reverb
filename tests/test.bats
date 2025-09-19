@@ -34,22 +34,31 @@ setup() {
   cd "${TESTDIR}"
   run ddev config --project-name="${PROJNAME}" --project-tld=ddev.site
   assert_success
-  run ddev start -y
+
+  # Setup a "current" Laravel project
+  run install_laravel
   assert_success
 }
 
+install_laravel() {
+  ddev config --project-type=laravel --docroot=public
+  ddev restart
+  ddev composer create "laravel/laravel"
+
+  ddev artisan key:generate
+  ddev artisan migrate:fresh -q
+
+  # Setup broadcasting. This is done as part of the add-on installation, but included here for documentation.
+  # ddev artisan install:broadcasting --reverb --without-node -n
+}
+
 health_checks() {
-  # Do something useful here that verifies the add-on
+  # Assert the port mapping is displayed in status
+  ddev status | grep web:8080
 
-  # You can check for specific information in headers:
-  # run curl -sfI https://${PROJNAME}.ddev.site
-  # assert_output --partial "HTTP/2 200"
-  # assert_output --partial "test_header"
-
-  # Or check if some command gives expected output:
-  DDEV_DEBUG=true run ddev launch
-  assert_success
-  assert_output --partial "FULLURL https://${PROJNAME}.ddev.site"
+  # Assert service reports as up
+  ddev logs -s web | grep 'Starting server on 0.0.0.0:8080'
+  ddev logs -s web | grep 'reverb entered RUNNING state, process has stayed up for > than 3 seconds'
 }
 
 teardown() {
@@ -69,8 +78,10 @@ teardown() {
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${DIR}"
   assert_success
+
   run ddev restart -y
   assert_success
+
   health_checks
 }
 
@@ -80,7 +91,9 @@ teardown() {
   echo "# ddev add-on get ${GITHUB_REPO} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${GITHUB_REPO}"
   assert_success
+
   run ddev restart -y
   assert_success
+
   health_checks
 }

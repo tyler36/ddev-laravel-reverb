@@ -1,6 +1,10 @@
 name: laravel-reverb
 
 project_files:
-  - docker-compose.laravel-reverb.yaml
+  - config.laravel-reverb.yaml
+
+post_install_actions:
+  # Install broadcasting with reverb and do NOT prompt to install Node dependencies
+  - ddev artisan install:broadcasting --reverb --without-node -n
 
 ddev_version_constraint: '>= v1.24.3'
