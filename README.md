@@ -7,7 +7,9 @@
 
 ## Overview
 
-This add-on integrates Laravel Reverb into your [DDEV](https://ddev.com/) project.
+This add-on integrates [Laravel Reverb](https://reverb.laravel.com/) into your [DDEV](https://ddev.com/) project.
+
+See [Laravel Reverb documentation](https://laravel.com/docs/master/reverb) for more details.
 
 ## Installation
 
@@ -18,30 +20,27 @@ ddev restart
 
 After installation, make sure to commit the `.ddev` directory to version control.
 
+This add-on attempts to configure Laravel for Reverb.
+You can manually re-run the wizard using: `ddev artisan install:broadcasting`
+
 ## Usage
 
 | Command | Description |
 | ------- | ----------- |
 | `ddev describe` | View service status and used ports for Laravel Reverb |
-| `ddev logs -s laravel-reverb` | Check Laravel Reverb logs |
+| `ddev logs -s web` | Check Laravel Reverb logs |
 
 ## Advanced Customization
 
-To change the Docker image:
+To customize this service, remove `#ddev-generated` from `.ddev/config.laravel-reverb.yaml` before making any changes.
 
-```bash
-ddev dotenv set .ddev/.env.laravel-reverb --laravel-reverb-docker-image="ddev/ddev-utilities:latest"
-ddev add-on get tyler36/ddev-laravel-reverb
-ddev restart
-```
+- To disable auto-start, comment out the `web_extra_daemons` section.
+- To change reverb ports, update the `web_extra_exposed_ports` section.
 
-Make sure to commit the `.ddev/.env.laravel-reverb` file to version control.
+> [!IMPORTANT]
+> `http_port` and `https_port` are required and must be different for `ddev-router` to start.
 
-All customization options (use with caution):
-
-| Variable | Flag | Default |
-| -------- | ---- | ------- |
-| `LARAVEL_REVERB_DOCKER_IMAGE` | `--laravel-reverb-docker-image` | `ddev/ddev-utilities:latest` |
+Make sure to commit the `.ddev/config.laravel-reverb.yaml` file to version control.
 
 ## Credits
 
