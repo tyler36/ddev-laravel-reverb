@@ -4,7 +4,28 @@ project_files:
   - config.laravel-reverb.yaml
 
 post_install_actions:
+  # Manually install older version of Reverb
+  - ddev composer require 'laravel/reverb:^1.0' --with-all-dependencies -n
   # Install broadcasting with reverb and do NOT prompt to install Node dependencies
   - ddev artisan install:broadcasting --reverb --without-node -n
+  # Add Reverb environment variables with ddev dotenv, without changing existing values
+  - |
+    add_if_missing() {
+      option="$1"
+      value="$2"
+      if ! ddev dotenv get .env "--${option}" >/dev/null 2>&1; then
+        ddev dotenv set .env "--${option}=${value}"
+      fi
+    }
 
+    add_if_missing broadcast-connection reverb
+    add_if_missing reverb-app-id your-app-id
+    add_if_missing reverb-app-key your-app-key
+    add_if_missing reverb-app-secret your-app-secret
+    add_if_missing reverb-host 127.0.0.1
+    add_if_missing reverb-port 8080
+    add_if_missing reverb-scheme http
+    ddev restart # restart DDEV to apply changes
+  # - ddev artisan config:clear
+  # - ddev artisan cache:clear
 ddev_version_constraint: '>= v1.24.3'

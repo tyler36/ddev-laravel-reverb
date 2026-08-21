@@ -32,7 +32,7 @@ setup() {
   export DDEV_NO_INSTRUMENTATION=true
   ddev delete -Oy "${PROJNAME}" >/dev/null 2>&1 || true
   cd "${TESTDIR}"
-  run ddev config --project-name="${PROJNAME}" --project-tld=ddev.site
+  run ddev config --project-type=laravel --docroot=public
   assert_success
 
   # Setup a "current" Laravel project
@@ -41,12 +41,10 @@ setup() {
 }
 
 install_laravel() {
-  ddev config --project-type=laravel --docroot=public
-  ddev restart
-  ddev composer create "laravel/laravel"
-
-  ddev artisan key:generate
-  ddev artisan migrate:fresh -q
+  run ddev start
+  assert_success
+  run ddev composer create-project laravel/laravel
+  assert_success
 
   # Setup broadcasting. This is done as part of the add-on installation, but included here for documentation.
   # ddev artisan install:broadcasting --reverb --without-node -n
