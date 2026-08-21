@@ -4,6 +4,8 @@ project_files:
   - config.laravel-reverb.yaml
 
 post_install_actions:
+  # Manually install older version of Reverb
+  - ddev composer require 'laravel/reverb:^1.0' --with-all-dependencies -n
   # Install broadcasting with reverb and do NOT prompt to install Node dependencies
   - ddev artisan install:broadcasting --reverb --without-node -n
 
